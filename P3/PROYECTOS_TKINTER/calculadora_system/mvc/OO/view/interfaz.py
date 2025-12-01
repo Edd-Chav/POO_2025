@@ -1,68 +1,99 @@
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, ttk
+import tkinter.font as tkfont
 from controller import funciones
 from model import operaciones
 
 class Vista:
     def __init__(self,ventana):
-        ventana.title("Calculadora básica")
-        ventana.geometry("800x600")
+        ventana.title("Calculadora bonita")
+        ventana.geometry("420x480")
         ventana.resizable(False,False)
-        self.int_principal(ventana) 
+        self.bg_color = "#f0f4f8"
+        self.panel_color = "#ffffff"
+        self.primary = "#4a90e2"
+        self.accent = "#50c878"
+        ventana.configure(bg=self.bg_color)
+        self.default_font = tkfont.Font(family="Segoe UI", size=11)
+        self.big_font = tkfont.Font(family="Segoe UI", size=14, weight="bold")
+        self.int_principal(ventana)
     
     @staticmethod
     def borrarPantalla(ventana):
         for widget in ventana.winfo_children():
             widget.destroy()
     
-
     @staticmethod
     def int_principal(ventana):
         Vista.borrarPantalla(ventana)
         Vista.menuPrincipal(ventana)
+
         n1=IntVar()
         n2=IntVar()
-        marco_numeros=Frame(ventana,width=70,height=40,bg="lightblue",relief=SOLID)
-        marco_numeros.pack_propagate(False)
-        marco_numeros.pack(pady=10)
-        marco_operaciones=Frame(ventana,width=400,height=200,bg="lightblue",relief=SOLID)
-        marco_operaciones.pack_propagate(False)
-        marco_operaciones.pack(pady=10)
-        numero1=Entry(marco_numeros,textvariable=n1,width=5,justify="right")
+
+        # Header
+        header = Frame(ventana, bg=ventana['bg'])
+        header.pack(pady=(12,6))
+        lbl_title = Label(header, text="Calculadora", bg=ventana['bg'], fg="#333333", font=("Segoe UI",18,"bold"))
+        lbl_title.pack()
+
+        # Input panel
+        panel = Frame(ventana, bg="#ffffff", bd=0, relief=FLAT)
+        panel.pack(padx=20, pady=10, fill="x")
+        panel.config(highlightbackground="#e2e8f0", highlightthickness=1)
+
+        lbl1 = Label(panel, text="Número 1", bg="#ffffff", fg="#444444", font=("Segoe UI",10))
+        lbl1.pack(anchor="w", padx=12, pady=(12,0))
+        numero1 = Entry(panel, textvariable=n1, justify="right", font=("Segoe UI",14), bd=0, bg="#f7fafc")
+        numero1.pack(fill="x", padx=12, pady=(4,10))
         numero1.focus()
-        numero1.pack(side="top",anchor="center")
 
-        numero2=Entry(marco_numeros,textvariable=n2,width=5,justify="right")
-        numero2.pack(side="top",anchor="center")
+        lbl2 = Label(panel, text="Número 2", bg="#ffffff", fg="#444444", font=("Segoe UI",10))
+        lbl2.pack(anchor="w", padx=12)
+        numero2 = Entry(panel, textvariable=n2, justify="right", font=("Segoe UI",14), bd=0, bg="#f7fafc")
+        numero2.pack(fill="x", padx=12, pady=(4,12))
 
-        btn_suma=Button(marco_operaciones,text=" + ",command=lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"+"))
-        btn_suma.grid(column=0,row=0,padx=3,pady=3)
-        btn_resta=Button(marco_operaciones,text=" - ",command=lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"-"))
-        btn_resta.grid(column=1,row=0,padx=3,pady=3)
+        # Buttons frame
+        botones = Frame(ventana, bg=ventana['bg'])
+        botones.pack(pady=8)
 
-        btn_mult=Button(marco_operaciones,text=" * ",command=lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"x"))
-        btn_mult.grid(column=2,row=0,padx=3,pady=3)
+        btn_opts = [('+', lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"+")),
+                    ('-', lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"-")),
+                    ('×', lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"x")),
+                    ('÷', lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"/"))]
 
-        btn_division=Button(marco_operaciones,text=" / ",command=lambda: funciones.Funciones.insertar(n1.get(),n2.get(),"/"))
-        btn_division.grid(column=3,row=0,padx=3,pady=3)
+        btn_style = { 'font': ("Segoe UI", 14, 'bold'), 'width':5, 'height':1, 'bd':0 }
 
-        btn_salir=Button(ventana,text="salir",command=ventana.quit)
-        btn_salir.pack()
+        for i, (txt, cmd) in enumerate(btn_opts):
+            b = Button(botones, text=txt, command=cmd, bg="#4a90e2", fg="#ffffff", activebackground="#357ab8", **btn_style)
+            b.grid(row=0, column=i, padx=6, pady=6)
+
+        # Action row
+        actions = Frame(ventana, bg=ventana['bg'])
+        actions.pack(pady=(6,12))
+
+        btn_clear = Button(actions, text="Limpiar", command=lambda: (numero1.delete(0,END), numero2.delete(0,END)), bg="#f44336", fg="#ffffff", **btn_style)
+        btn_clear.grid(row=0, column=0, padx=8)
+
+        btn_consultar = Button(actions, text="Consultar", command=lambda: Vista.consultar(ventana), bg="#6c757d", fg="#ffffff", **btn_style)
+        btn_consultar.grid(row=0, column=1, padx=8)
+
+        btn_salir = Button(actions, text="Salir", command=ventana.quit, bg="#2d3748", fg="#ffffff", **btn_style)
+        btn_salir.grid(row=0, column=2, padx=8)
     
- 
     @staticmethod    
     def menuPrincipal(ventana):
         menuBar=Menu(ventana)
         ventana.config(menu=menuBar)
         operacionesMenu = Menu(menuBar , tearoff=False)
         menuBar.add_cascade(label="Operaciones",menu=operacionesMenu)
-        operacionesMenu.add_command(label="Agregar",command=lambda:Vista.interfaz_principal(ventana) )
+        operacionesMenu.add_command(label="Agregar",command=lambda:Vista.int_principal(ventana) )
         operacionesMenu.add_command(label="Consultar",command=lambda:Vista.consultar(ventana))
         operacionesMenu.add_command(label="Cambiar",command=lambda:Vista.buscar_id(ventana,"cambiar"))
         operacionesMenu.add_command(label="Borrar",command=lambda: Vista.buscar_id(ventana,"borrar"))
         operacionesMenu.add_separator()
         operacionesMenu.add_command(label="Salir",command=ventana.quit)
-    
+
   
     @staticmethod
     def eliminar_id(ventana,id_):
@@ -83,7 +114,7 @@ class Vista:
             txt_id_eliminar.pack(pady=5)
             btn_eliminar=Button(ventana,text="Eliminar",command= lambda: funciones.Funciones.eliminar(id.get()))
             btn_eliminar.pack()
-            btn_volver=Button(ventana,text="Volver",command=lambda: Vista.interfaz_principal(ventana))
+            btn_volver=Button(ventana,text="Volver",command=lambda: Vista.int_principal(ventana))
             btn_volver.pack()
         
   
@@ -107,7 +138,7 @@ class Vista:
             messagebox.showinfo(icon="info",message="No existen operaciones guardadas en la BD")
        
 
-        btn_volver=Button(ventana,text="Volver",command=lambda: Vista.interfaz_principal(ventana))
+        btn_volver=Button(ventana,text="Volver",command=lambda: Vista.int_principal(ventana))
         btn_volver.pack()
     
     @staticmethod
@@ -161,7 +192,7 @@ class Vista:
             btn_guardar=Button(ventana,text="Guardar",command=lambda:funciones.Funciones.actualizar(n1.get(),n2.get(),signo.get(),resultado.get(),id.get()))
             btn_guardar.pack(pady=5)
         
-            btn_volver=Button(ventana,text="Volver",command=lambda: Vista.interfaz_principal(ventana))
+            btn_volver=Button(ventana,text="Volver",command=lambda: Vista.int_principal(ventana))
             btn_volver.pack(pady=5)
     
     @staticmethod
@@ -185,3 +216,4 @@ class Vista:
         elif tipo=="borrar":
             Button(ventana,text="Buscar",command=lambda: Vista.eliminar_id(ventana, id.get(),)).pack(pady=5)
         
+    
