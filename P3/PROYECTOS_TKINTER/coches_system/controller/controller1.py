@@ -1,23 +1,11 @@
-<<<<<<< HEAD
+
 from model import cochesBD
 from view import view1
 from tkinter import messagebox
 
 
 """
-4 DICIEMBRE
-    1)CONTROLADOR:
-    1.1 insertar_camionetas()
-    1.2 consultar_camionetas()
-    1.3 cambiar_camionetas()
-    1.4 borrar_camionetas()
 
-
-5 DICIEIMBRE
-    1) CONTROLADOR:
-    1.1 insertar_camiones()
-    1.2 consultar_camiones()
-    1.3 cambiar_camiones
 
 """
 
