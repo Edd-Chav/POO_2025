@@ -14,4 +14,9 @@ if __name__=="__main__":
     ventana=Tk()
     app=App(ventana)
     ventana.mainloop()
+<<<<<<< HEAD
     8
+=======
+    
+
+>>>>>>> 26b6cb7826b7ad429f2a5ba8d40e9ac1753205af

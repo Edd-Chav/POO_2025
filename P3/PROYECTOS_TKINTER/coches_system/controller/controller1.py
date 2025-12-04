@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from model import cochesBD
 from view import view1
 from tkinter import messagebox
@@ -45,7 +46,7 @@ class Controller:
     def insertar_camionetas(marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada):
         resultado = cochesBD.Camionetas.insertar(marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada)
         Controller.respuesta_sql(resultado)
-        
+
     @staticmethod
     def consultar_camionetas():
         camionetas = cochesBD.Camionetas.consultar()
@@ -67,5 +68,4 @@ class Controller:
             messagebox.showinfo(message=f" Acción Realizada con Éxito ",icon="info")
         else:
             messagebox.showinfo(message="\n\t...No fue posible realizar la acción correctamente, vuelva a intentar...",icon="info")
-
 
