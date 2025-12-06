@@ -53,9 +53,9 @@ class View:
         btn_registro.pack(pady=10)
         btn_login=Button(ventana,text="2.- Consultar",justify="center", command=lambda: View.camioneta_consultar(ventana))
         btn_login.pack(pady=10)
-        btn_salir=Button(ventana,text="3.- Actualizar",justify="center",command=lambda: View.camioenta_id(ventana,"cambiar"))
+        btn_salir=Button(ventana,text="3.- Actualizar",justify="center",command=lambda: View.camioneta_id(ventana,"cambiar"))
         btn_salir.pack(pady=10)
-        btn_salir=Button(ventana,text="4.- Eliminar",justify="center",command=lambda:View.camioenta_id(ventana,"eliminar"))
+        btn_salir=Button(ventana,text="4.- Eliminar",justify="center",command=lambda:View.camioneta_id(ventana,"eliminar"))
         btn_salir.pack(pady=10)
         btn_volver=Button(ventana,text="5.- Regresar",command=lambda: View.menu_principal(ventana))
         btn_volver.pack(pady=10)
@@ -65,13 +65,13 @@ class View:
         View.borrarPantalla(ventana)
         lbl_titulo=Label(ventana,text="..:: Menú Camiones ::..",justify="center")
         lbl_titulo.pack(pady=15)
-        btn_registro=Button(ventana,text="1.- Insertar",justify="center",command=lambda: View.camioneta_registro(ventana))
+        btn_registro=Button(ventana,text="1.- Insertar",justify="center",command=lambda: View.camion_registro(ventana))
         btn_registro.pack(pady=10)
-        btn_login=Button(ventana,text="2.- Consultar",justify="center", command=lambda: View.camioneta_consultar(ventana))
+        btn_login=Button(ventana,text="2.- Consultar",justify="center", command=lambda: View.camion_consultar(ventana))
         btn_login.pack(pady=10)
-        btn_salir=Button(ventana,text="3.- Actualizar",justify="center",command=lambda: View.camioenta_id(ventana, "cambiar"))
+        btn_salir=Button(ventana,text="3.- Actualizar",justify="center",command=lambda: View.camion_id(ventana, "cambiar"))
         btn_salir.pack(pady=10)
-        btn_salir=Button(ventana,text="4.- Eliminar",justify="center",command=lambda: View.camioenta_id(ventana, "eliminar"))
+        btn_salir=Button(ventana,text="4.- Eliminar",justify="center",command=lambda: View.camion_id(ventana, "eliminar"))
         btn_salir.pack(pady=10)
         btn_volver=Button(ventana,text="5.- Regresar",command=lambda: View.menu_principal(ventana))
         btn_volver.pack(pady=10)
@@ -294,7 +294,24 @@ class View:
         txt_cerrada=Entry(ventana)
         txt_cerrada.pack(pady=10)
 
-        btn_guardar=Button(ventana,text="Guardar", command=lambda: [messagebox.showinfo("Guardar", "Camioneta registrada correctamente"), View.menu_camionetas(ventana)])
+        lbl_traccion=Label(ventana,text="Traccion: ", justify="center")
+        lbl_traccion.pack(pady=10)
+        txt_traccion=Entry(ventana)
+        txt_traccion.pack(pady=10)
+
+        btn_guardar=Button(ventana,text="Guardar", command=lambda: [
+            controller1.Controller.registro_camioneta(
+                txt_marca.get(),
+                txt_color.get(),
+                txt_modelo.get(),
+                txt_velocidad.get(),
+                txt_potencia.get(),
+                txt_nro_plazas.get(),
+                txt_traccion.get(),
+                txt_cerrada.get()
+            ),
+            View.menu_camionetas(ventana)
+        ])
         btn_guardar.pack(pady=10)
         btn_volver=Button(ventana,text="Volver",command=lambda: View.menu_camionetas(ventana))
         btn_volver.pack(pady=10)
@@ -308,23 +325,24 @@ class View:
         txt_consulta = Text(ventana, height=20, width=80)
         txt_consulta.pack(pady=10)
 
-        datos_simulados = (
-            "ID | Marca | Color | Modelo | Vel. | Potencia | Plazas | Cerrada/Abierta\n"
-            "--------------------------------------------------------------------------------\n"
-            "1 | Ford | Rojo | Mustang | 250 | 450 | 4 | Si\n"
-            "2 | Honda | Azul | Civic | 180 | 158 | 5 | No\n"
-            "3 | Toyota | Blanco | Corolla | 190 | 169 | 5 | Si\n"
-            "4 | Tesla | Negro | Model 3 | 261 | 450 | 5 | No\n"
-        )
+        encabezado = "ID | Marca | Color | Modelo | Vel. | Potencia | Plazas | Traccion | Cerrada/abierta\n"
+        encabezado += "-" * 80 + "\n"
+        txt_consulta.insert(END, encabezado)
+        registros = controller1.Controller.consultar_camionetas()
         
-        txt_consulta.insert(END, datos_simulados)
+        if registros and len(registros) > 0:
+            for fila in registros:
+                texto_fila = f"{fila[0]} | {fila[1]} | {fila[2]} | {fila[3]} | {fila[4]} | {fila[5]} | {fila[6]} | {fila[7]} | {fila[8]}\n"
+                txt_consulta.insert(END, texto_fila)
+        else:
+            pass
         txt_consulta.config(state=DISABLED) 
 
         btn_volver = Button(ventana, text="Regresar", command=lambda: View.menu_camionetas(ventana))
         btn_volver.pack(pady=10)
 
     @staticmethod
-    def camioenta_id(ventana,tipo):
+    def camioneta_id(ventana,tipo):
         View.borrarPantalla(ventana)
         lbl_titulo=Label(ventana,text="...: Ingresa ID de la Camioneta :...", justify="center")
         lbl_titulo.pack(pady=15)
@@ -339,7 +357,7 @@ class View:
         elif tipo=="eliminar":
             Button(ventana,text="Buscar", command=lambda:View.eliminar_camioneta(ventana,id.get())).pack(pady=5)
         
-        btn_regresar=Button(ventana,text="Regresar", command=lambda: View.menu_camiones(ventana))
+        btn_regresar=Button(ventana,text="Regresar", command=lambda: View.menu_camionetas(ventana))
         btn_regresar.pack(pady=5)
 
     @staticmethod
@@ -384,7 +402,16 @@ class View:
         txt_cerrada=Entry(ventana)
         txt_cerrada.pack(pady=10)
 
-        btn_guardar=Button(ventana,text="Guardar", command=lambda: [messagebox.showinfo("Guardar", f"Camioneta {id} modificada correctamente"), View.menu_camionetas(ventana)])
+        btn_guardar=Button(ventana,text="Guardar", command=lambda: controller1.Controller.cambiar_camioneta(
+            txt_marca.get(),
+            txt_color.get(),
+            txt_modelo.get(),
+            txt_velocidad.get(),
+            txt_potencia.get(),
+            txt_nro_plazas.get(),
+            txt_cerrada.get(),
+            id
+        ))
         btn_guardar.pack(pady=10)
         btn_volver=Button(ventana,text="Volver",command=lambda: View.menu_camionetas(ventana))
         btn_volver.pack(pady=10)
@@ -395,7 +422,7 @@ class View:
         lbl_titulo=Label(ventana,text=f"...: Eliminar Camioneta {id} :...", justify="center")
         lbl_titulo.pack(pady=15)
 
-        btn_borrar=Button(ventana,text="Eliminar", command=lambda: [messagebox.showinfo("Eliminar", f"Camioneta {id} eliminada correctamente"), View.menu_camionetas(ventana)])
+        btn_borrar=Button(ventana,text="Eliminar", command=lambda: controller1.Controller.borrar_camioneta(id))
         btn_borrar.pack(pady=10)
         btn_volver=Button(ventana,text="Volver",command=lambda: View.menu_camionetas(ventana))
         btn_volver.pack(pady=10)
@@ -447,9 +474,22 @@ class View:
         txt_capacidad=Entry(ventana)
         txt_capacidad.pack(pady=10)
 
-        btn_guardar=Button(ventana,text="Guardar", command=lambda: [messagebox.showinfo("Guardar", "Camion registrada correctamente"), View.menu_camiones(ventana)])
+        btn_guardar = Button(ventana, text="Guardar", command=lambda: [
+            controller1.Controller.registro_camion(
+                txt_marca.get(), 
+                txt_color.get(), 
+                txt_modelo.get(), 
+                txt_velocidad.get(), 
+                txt_potencia.get(), 
+                txt_nro_plazas.get(),
+                txt_ejes.get(),
+                txt_capacidad.get()
+            ),
+            View.menu_camiones(ventana)
+        ])
         btn_guardar.pack(pady=10)
-        btn_volver=Button(ventana,text="Volver",command=lambda: View.menu_camiones(ventana))
+        
+        btn_volver = Button(ventana, text="Volver", command=lambda: View.menu_camiones(ventana))
         btn_volver.pack(pady=10)
 
     @staticmethod
@@ -461,16 +501,17 @@ class View:
         txt_consulta = Text(ventana, height=20, width=80)
         txt_consulta.pack(pady=10)
 
-        datos_simulados = (
-            "ID | Marca | Color | Modelo | Vel. | Potencia | Plazas | Ejes | Capacidad |\n"
-            "--------------------------------------------------------------------------------\n"
-            "1 | Ford | Rojo | Mustang | 250 | 450 | 4 | 3 | 1000 |\n"
-            "2 | Honda | Azul | Civic | 180 | 158 | 5 | 2 | 800 |\n"
-            "3 | Toyota | Blanco | Corolla | 190 | 169 | 5 | 2 | 900 |\n"
-            "4 | Tesla | Negro | Model 3 | 261 | 450 | 5 | 2 | 1200 |\n"
-        )
+        encabezado = "ID | Marca | Color | Modelo | Vel. | Potencia | Plazas | Ejes | Capacidad\n"
+        encabezado += "-" * 80 + "\n"
+        txt_consulta.insert(END, encabezado)
+        registros = controller1.Controller.consultar_camiones()
         
-        txt_consulta.insert(END, datos_simulados)
+        if registros and len(registros) > 0:
+            for fila in registros:
+                texto_fila = f"{fila[0]} | {fila[1]} | {fila[2]} | {fila[3]} | {fila[4]} | {fila[5]} | {fila[6]} | {fila[7]} | {fila[8]}"
+                txt_consulta.insert(END, texto_fila)
+        else:
+            pass
         txt_consulta.config(state=DISABLED) 
 
         btn_volver = Button(ventana, text="Regresar", command=lambda: View.menu_camiones(ventana))
@@ -542,18 +583,29 @@ class View:
         txt_capacidad=Entry(ventana)
         txt_capacidad.pack(pady=10)
 
-        btn_guardar=Button(ventana,text="Guardar", command=lambda: [messagebox.showinfo("Guardar", f"Camion {id} modificado correctamente"), View.menu_camiones(ventana)])
+        btn_guardar=Button(ventana,text="Guardar", command=lambda: controller1.Controller.cambiar_camion(
+            txt_marca.get(),
+            txt_color.get(),
+            txt_modelo.get(),
+            txt_velocidad.get(),
+            txt_potencia.get(),
+            txt_nro_plazas.get(),
+            txt_ejes.get(),
+            txt_capacidad.get(),
+            id
+        ))
         btn_guardar.pack(pady=10)
         btn_volver=Button(ventana,text="Volver",command=lambda: View.menu_camiones(ventana))
         btn_volver.pack(pady=10)
 
     @staticmethod
     def eliminar_camiones(ventana, id):
+#churn en un saas
         View.borrarPantalla(ventana)
         lbl_titulo=Label(ventana,text=f"...: Eliminar Camion {id} :...", justify="center")
         lbl_titulo.pack(pady=15)
 
-        btn_borrar=Button(ventana,text="Eliminar", command=lambda: [messagebox.showinfo("Eliminar", f"Camion {id} eliminado correctamente"), View.menu_camiones(ventana)])
+        btn_borrar=Button(ventana,text="Eliminar", command=lambda: controller1.Controller.borrar_camion(id))
         btn_borrar.pack(pady=10)
         btn_volver=Button(ventana,text="Volver",command=lambda: View.menu_camiones(ventana))
         btn_volver.pack(pady=10)
